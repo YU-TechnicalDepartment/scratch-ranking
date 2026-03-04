@@ -12,26 +12,27 @@ export async function getScratchTokens(username, password) {
   const page = await browser.newPage();
   await page.goto("https://scratch.mit.edu/login", { waitUntil: "networkidle2" });
 
-  // Shadow DOM 内の input を取得する関数
-  async function queryShadow(selector) {
-    return await page.evaluateHandle(sel => {
-      const root = document.querySelector("scratch-app")?.shadowRoot;
-      if (!root) return null;
-      return root.querySelector(sel);
-    }, selector);
-  }
+  // Shadow DOM 内の input に直接値を入れる
+  await page.evaluate((username, password) => {
+    const root = document.querySelector("scratch-app")?.shadowRoot;
+    if (!root) throw new Error("shadowRoot が見つからない");
 
-  // ユーザー名入力
-  const userInput = await queryShadow("input[name='username']");
-  await userInput.type(username);
+    const userInput = root.querySelector("input[name='username']");
+    const passInput = root.querySelector("input[name='password']");
+    const loginBtn = root.querySelector("button[type='submit']");
 
-  // パスワード入力
-  const passInput = await queryShadow("input[name='password']");
-  await passInput.type(password);
+    if (!userInput || !passInput || !loginBtn) {
+      throw new Error("ログインフォームが見つからない");
+    }
 
-  // ログインボタン
-  const loginBtn = await queryShadow("button[type='submit']");
-  await loginBtn.click();
+    userInput.value = username;
+    userInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+    passInput.value = password;
+    passInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+    loginBtn.click();
+  }, username, password);
 
   // ログイン完了待ち
   await page.waitForNavigation({ waitUntil: "networkidle2" });
