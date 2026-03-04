@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 
 export async function loginScratch(username, password) {
-  // まずCSRFトークンを取得
+  // CSRFトークン取得
   const csrfReq = await fetch("https://scratch.mit.edu/csrf_token/");
   const csrfCookie = csrfReq.headers.raw()["set-cookie"].find(c => c.startsWith("scratchcsrftoken="));
   const csrfToken = csrfCookie.split("=")[1].split(";")[0];
@@ -25,8 +25,6 @@ export async function loginScratch(username, password) {
   if (!cookies) throw new Error("ログイン失敗");
 
   let session = "";
-  let token = csrfToken;
-
   for (const c of cookies) {
     if (c.startsWith("scratchsessionsid=")) {
       session = c.split(";")[0];
@@ -34,7 +32,7 @@ export async function loginScratch(username, password) {
   }
 
   return {
-    cookie: `${session}; scratchcsrftoken=${token};`,
-    token
+    cookie: `${session}; scratchcsrftoken=${csrfToken};`,
+    token: csrfToken
   };
 }
