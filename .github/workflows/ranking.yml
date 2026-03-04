@@ -1,0 +1,27 @@
+name: Scratch Ranking
+
+on:
+  schedule:
+    - cron: "0 15 * * *"  # JST 0:00
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ranking script
+        env:
+          SCRATCH_USERNAME: ${{ secrets.SCRATCH_USERNAME }}
+          SCRATCH_PASSWORD: ${{ secrets.SCRATCH_PASSWORD }}
+        run: node scripts/main.js
