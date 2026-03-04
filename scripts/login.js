@@ -1,18 +1,23 @@
 import fetch from "node-fetch";
 
 export async function loginScratch(username, password) {
-  const csrf = "a"; // 適当でOK
+  // まずCSRFトークンを取得
+  const csrfReq = await fetch("https://scratch.mit.edu/csrf_token/");
+  const csrfCookie = csrfReq.headers.raw()["set-cookie"].find(c => c.startsWith("scratchcsrftoken="));
+  const csrfToken = csrfCookie.split("=")[1].split(";")[0];
 
-  const res = await fetch("https://scratch.mit.edu/login/", {
+  // ログイン
+  const res = await fetch("https://scratch.mit.edu/accounts/login/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": csrf,
-      "Cookie": `scratchcsrftoken=${csrf};`
+      "X-CSRFToken": csrfToken,
+      "Cookie": `scratchcsrftoken=${csrfToken};`
     },
     body: JSON.stringify({
       username,
-      password
+      password,
+      useMessages: true
     })
   });
 
@@ -20,14 +25,11 @@ export async function loginScratch(username, password) {
   if (!cookies) throw new Error("ログイン失敗");
 
   let session = "";
-  let token = "";
+  let token = csrfToken;
 
   for (const c of cookies) {
     if (c.startsWith("scratchsessionsid=")) {
       session = c.split(";")[0];
-    }
-    if (c.startsWith("scratchcsrftoken=")) {
-      token = c.split(";")[0].split("=")[1];
     }
   }
 
