@@ -22,7 +22,7 @@ export async function clearStudio(cookie, token) {
   console.log("削除対象作品数:", list.length);
 
   for (const p of list) {
-    const url = `https://scratch.mit.edu/site-api/projects/in/${STUDIO_ID}/${p.id}/`;
+    const url = `https://api.scratch.mit.edu/studios/${STUDIO_ID}/project/${p.id}`;
 
     const res = await fetch(url, {
       method: "DELETE",
@@ -43,7 +43,7 @@ export async function clearStudio(cookie, token) {
 
 // スタジオに作品を追加
 export async function addProject(cookie, token, id) {
-  const url = `https://scratch.mit.edu/site-api/projects/in/${STUDIO_ID}/${id}/`;
+  const url = `https://api.scratch.mit.edu/studios/${STUDIO_ID}/project/${id}`;
 
   const res = await fetch(url, {
     method: "PUT",
