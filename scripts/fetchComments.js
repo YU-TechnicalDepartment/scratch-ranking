@@ -4,8 +4,27 @@ const COMMENT_PROJECT_ID = 1286429603;
 
 export async function fetchValidComments() {
   const url = `https://api.scratch.mit.edu/projects/${COMMENT_PROJECT_ID}/comments?offset=0&limit=40`;
+
   const res = await fetch(url);
-  const comments = await res.json();
+
+  if (!res.ok) {
+    console.log("コメント取得失敗:", res.status, await res.text());
+    return [];
+  }
+
+  let comments;
+  try {
+    comments = await res.json();
+  } catch (e) {
+    console.log("JSON パース失敗:", e);
+    return [];
+  }
+
+  // ★ ここが重要：配列じゃなかったら無視
+  if (!Array.isArray(comments)) {
+    console.log("コメント API が配列を返さなかった:", comments);
+    return [];
+  }
 
   const regex = /^✦\s*https:\/\/scratch\.mit\.edu\/projects\/(\d+)\/\s*✦\s*(\d{4})\/(\d{1,2})\/(\d{1,2})$/;
 
