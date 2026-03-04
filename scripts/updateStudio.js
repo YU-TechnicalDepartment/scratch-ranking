@@ -2,47 +2,58 @@ import fetch from "node-fetch";
 
 const STUDIO_ID = 51407751;
 
-async function getStudioProjects() {
-  const url = `https://api.scratch.mit.edu/studios/${STUDIO_ID}/projects/`;
-  const res = await fetch(url);
-  return await res.json();
+function buildCookie(tokens) {
+  return (
+    `scratchsessionsid=${tokens.session}; ` +
+    `scratchcsrftoken=${tokens.csrftoken}; ` +
+    `scratchtoken=${tokens.xtoken};`
+  );
 }
 
-export async function clearStudio(cookie, token, xtoken) {
-  const list = await getStudioProjects();
+export async function clearStudio(tokens) {
+  const cookie = buildCookie(tokens);
+
+  const list = await fetch(
+    `https://api.scratch.mit.edu/studios/${STUDIO_ID}/projects/`
+  ).then(r => r.json());
+
   console.log("削除対象作品数:", list.length);
 
   for (const p of list) {
-    const url = `https://api.scratch.mit.edu/studios/${STUDIO_ID}/project/${p.id}`;
-
-    const res = await fetch(url, {
-      method: "DELETE",
-      headers: {
-        "X-CSRFToken": token,
-        "X-Token": xtoken,
-        "Cookie": cookie,
-        "Referer": `https://scratch.mit.edu/studios/${STUDIO_ID}/projects/`
+    const res = await fetch(
+      `https://api.scratch.mit.edu/studios/${STUDIO_ID}/project/${p.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "X-Token": tokens.xtoken,
+          "X-CSRFToken": tokens.csrftoken,
+          "X-Requested-With": "XMLHttpRequest",
+          "Cookie": cookie,
+          "Referer": "https://scratch.mit.edu/"
+        }
       }
-    });
+    );
 
-    console.log("DELETE", p.id, "→", res.status);
-    if (!res.ok) console.log("DELETE失敗詳細:", await res.text());
+    console.log("DELETE", p.id, res.status);
   }
 }
 
-export async function addProject(cookie, token, xtoken, id) {
-  const url = `https://api.scratch.mit.edu/studios/${STUDIO_ID}/project/${id}`;
+export async function addProject(tokens, id) {
+  const cookie = buildCookie(tokens);
 
-  const res = await fetch(url, {
-    method: "PUT",
-    headers: {
-      "X-CSRFToken": token,
-      "X-Token": xtoken,
-      "Cookie": cookie,
-      "Referer": `https://scratch.mit.edu/studios/${STUDIO_ID}/projects/`
+  const res = await fetch(
+    `https://api.scratch.mit.edu/studios/${STUDIO_ID}/project/${id}`,
+    {
+      method: "PUT",
+      headers: {
+        "X-Token": tokens.xtoken,
+        "X-CSRFToken": tokens.csrftoken,
+        "X-Requested-With": "XMLHttpRequest",
+        "Cookie": cookie,
+        "Referer": "https://scratch.mit.edu/"
+      }
     }
-  });
+  );
 
-  console.log("PUT", id, "→", res.status);
-  if (!res.ok) console.log("PUT失敗詳細:", await res.text());
+  console.log("PUT", id, res.status);
 }
