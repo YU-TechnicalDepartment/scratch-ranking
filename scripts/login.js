@@ -25,14 +25,25 @@ export async function loginScratch(username, password) {
   if (!cookies) throw new Error("ログイン失敗");
 
   let session = "";
+  let token = csrfToken;
+  let xtoken = "";
+
   for (const c of cookies) {
     if (c.startsWith("scratchsessionsid=")) {
       session = c.split(";")[0];
     }
+    if (c.startsWith("scratchtoken=")) {
+      xtoken = c.split(";")[0].split("=")[1];
+    }
+  }
+
+  if (!xtoken) {
+    throw new Error("X-Token が取得できませんでした");
   }
 
   return {
-    cookie: `${session}; scratchcsrftoken=${csrfToken};`,
-    token: csrfToken
+    cookie: `${session}; scratchcsrftoken=${token}; scratchtoken=${xtoken};`,
+    token,
+    xtoken
   };
 }
