@@ -3,7 +3,20 @@ import fetch from "node-fetch";
 const COMMENT_PROJECT_ID = 1286429603;
 
 export async function fetchValidComments() {
-  const url = `https://api.scratch.mit.edu/projects/${COMMENT_PROJECT_ID}/comments?offset=0&limit=40`;
+  // まずプロジェクト情報を取得して作者名を得る
+  const projectInfo = await fetch(`https://api.scratch.mit.edu/projects/${COMMENT_PROJECT_ID}/`)
+    .then(r => r.json())
+    .catch(() => null);
+
+  if (!projectInfo || !projectInfo.author || !projectInfo.author.username) {
+    console.log("プロジェクト情報取得失敗");
+    return [];
+  }
+
+  const username = projectInfo.author.username;
+
+  // 正しいコメント API
+  const url = `https://api.scratch.mit.edu/users/${username}/projects/${COMMENT_PROJECT_ID}/comments?limit=40&offset=0`;
 
   const res = await fetch(url);
 
@@ -20,7 +33,6 @@ export async function fetchValidComments() {
     return [];
   }
 
-  // ★ ここが重要：配列じゃなかったら無視
   if (!Array.isArray(comments)) {
     console.log("コメント API が配列を返さなかった:", comments);
     return [];
