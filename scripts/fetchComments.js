@@ -38,7 +38,7 @@ export async function fetchValidComments() {
     return [];
   }
 
-  const regex = /^✦\s*https:\/\/scratch\.mit\.edu\/projects\/(\d+)\/\s*✦\s*(\d{4})\/(\d{1,2})\/(\d{1,2})$/;
+  const regex = /^#\s*https:\/\/scratch\.mit\.edu\/projects\/(\d+)\/\s*#\s*(\d{4})\/(\d{1,2})\/(\d{1,2})$/;
 
   const today = new Date();
   const utcY = today.getUTCFullYear();
