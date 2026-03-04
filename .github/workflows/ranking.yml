@@ -1,8 +1,8 @@
-name: Scratch Ranking
+name: Ranking
 
 on:
   schedule:
-    - cron: "0 15 * * *"  # JST 0:00
+    - cron: "0 15 * * *" # JST 0:00
   workflow_dispatch:
 
 jobs:
@@ -12,16 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run ranking script
+      - name: Run ranking
+        run: node scripts/main.js
         env:
           SCRATCH_USERNAME: ${{ secrets.SCRATCH_USERNAME }}
           SCRATCH_PASSWORD: ${{ secrets.SCRATCH_PASSWORD }}
-        run: node scripts/main.js
