@@ -13,12 +13,25 @@ async function main() {
     if (p) projects.push(p);
   }
 
-  const ranked = projects
-    .map(p => ({
-      id: p.id,
-      username: p.author.username,
-      score: calcScore(p)
-    }))
+  // スコア付きデータに変換
+  const scored = projects.map(p => ({
+    id: p.id,
+    username: p.author.username,
+    score: calcScore(p)
+  }));
+
+  // ユーザーごとに最高スコアだけ残す
+  const bestByUser = {};
+  for (const p of scored) {
+    if (!bestByUser[p.username] || p.score > bestByUser[p.username].score) {
+      bestByUser[p.username] = p;
+    }
+  }
+
+  // 配列化してソート
+  const uniqueProjects = Object.values(bestByUser);
+
+  const ranked = uniqueProjects
     .sort((a, b) => b.score - a.score)
     .slice(0, 10);
 
