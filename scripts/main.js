@@ -24,15 +24,18 @@ async function main() {
 
   console.log("ランキング:", ranked);
 
+  // README 用 Markdown（コードブロック形式）
   const md =
     "# 🏆 自動ランキング（上位10件）\n\n" +
+    "```\n" +
     ranked
       .map(
         (p, i) =>
           `${i + 1} - @${p.username} (${p.score.toFixed(2)}Point)\nhttps://scratch.mit.edu/projects/${p.id}\n`
       )
       .join("\n") +
-    "\n（毎日自動更新）\n";
+    "```\n\n" +
+    "（毎日自動更新）\n";
 
   fs.writeFileSync("README.md", md);
 
