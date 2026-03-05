@@ -5,6 +5,9 @@ on:
     - cron: "0 15 * * *" # JST 0:00
   workflow_dispatch:
 
+permissions:
+  contents: write   # ← これが絶対必要！
+
 jobs:
   run:
     runs-on: ubuntu-latest
