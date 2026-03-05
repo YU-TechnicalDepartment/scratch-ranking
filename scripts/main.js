@@ -24,7 +24,6 @@ async function main() {
 
   console.log("ランキング:", ranked);
 
-  // README 用 Markdown 生成
   const md =
     "# 🏆 自動ランキング（上位10件）\n\n" +
     ranked
