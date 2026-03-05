@@ -11,12 +11,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
         run: npm install
 
       - name: Run ranking
         run: node scripts/main.js
-        env:
-          SCRATCH_USERNAME: ${{ secrets.SCRATCH_USERNAME }}
-          SCRATCH_PASSWORD: ${{ secrets.SCRATCH_PASSWORD }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add README.md
+          git commit -m "Update ranking" || echo "No changes"
+          git push
