@@ -2,7 +2,7 @@ name: Ranking
 
 on:
   schedule:
-    - cron: "0 15 * * *" # JST 0:00
+    - cron: "0 16 * * *" # JST 1:00
   workflow_dispatch:
 
 permissions:
